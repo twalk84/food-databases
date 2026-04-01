@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F.O.O.D. Databases — Household Supply Intelligence</title>
+  <meta name="description" content="F.O.O.D. Databases is a household supply management app with smart grocery lists, auto-replenishment, price tracking, and one-tap ordering. Coming soon to Android." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0f12;
+      --surface:   #13171d;
+      --border:    #1e242d;
+      --accent:    #c8f135;
+      --accent2:   #3bf5a0;
+      --muted:     #4a5568;
+      --text:      #e2e8f0;
+      --text-dim:  #8896aa;
+      --mono:      'DM Mono', monospace;
+      --display:   'Syne', sans-serif;
+      --body:      'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,241,53,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,241,53,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(13,15,18,0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+    }
+
+    .nav-badge {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.75rem;
+      border-radius: 2px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 8rem 2.5rem 5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      opacity: 0;
+      animation: fadeUp 0.6s 0.1s ease forwards;
+    }
+
+    .hero-tag::before {
+      content: '';
+      display: block;
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(3.5rem, 9vw, 7.5rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.2s ease forwards;
+    }
+
+    h1 .accent { color: var(--accent); }
+    h1 .dim    { color: var(--muted);  }
+
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--text-dim);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.35s ease forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.5s ease forwards;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--accent);
+      color: #0d0f12;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.85rem 1.75rem;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover { background: #d9ff4a; transform: translateY(-1px); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.85rem 1.75rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── SCROLL INDICATOR ── */
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeIn 1s 1.2s ease forwards;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 3rem;
+      background: linear-gradient(to bottom, var(--muted), transparent);
+      animation: scrollPulse 2s infinite;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 6rem 2.5rem;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 3.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+    }
+
+    .feature-card {
+      background: var(--surface);
+      padding: 2rem;
+      transition: background 0.2s;
+    }
+
+    .feature-card:hover { background: #161b23; }
+
+    .feature-icon {
+      font-size: 1.4rem;
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+
+    .feature-title {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    .feature-desc {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      line-height: 1.65;
+    }
+
+    /* ── STORE BADGES ── */
+    .stores {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2.5rem 6rem;
+    }
+
+    .store-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .store-badge {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      padding: 0.45rem 1rem;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+    }
+
+    .store-badge.primary {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(200,241,53,0.06);
+    }
+
+    .store-badge.secondary {
+      border-color: var(--accent2);
+      color: var(--accent2);
+      background: rgba(59,245,160,0.06);
+    }
+
+    /* ── NOTIFY FORM ── */
+    .notify {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 2.5rem 8rem;
+    }
+
+    .notify-box {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .notify-heading {
+      font-family: var(--display);
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .notify-heading span { color: var(--accent); }
+
+    .notify-sub {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      max-width: 420px;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .form-input {
+      flex: 1;
+      min-width: 220px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 0.9rem;
+      padding: 0.8rem 1.1rem;
+      border-radius: 2px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input::placeholder { color: var(--muted); }
+    .form-input:focus { border-color: var(--accent); }
+
+    .form-note {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-logo {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+    }
+
+    .footer-note {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; }
+      50%       { opacity: 1; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 1rem 1.25rem; }
+      .hero, .features, .stores, .notify { padding-left: 1.25rem; padding-right: 1.25rem; }
+      .notify-box { padding: 2rem 1.5rem; }
+      footer { padding: 1.5rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <span class="nav-logo">F.O.O.D. DATABASES</span>
+    <span class="nav-badge">COMING SOON · ANDROID</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-tag">Household Supply Intelligence</p>
+    <h1>
+      Your home.<br />
+      <span class="accent">Always stocked.</span><br />
+      <span class="dim">Never guessing.</span>
+    </h1>
+    <p class="hero-sub">
+      F.O.O.D. Databases tracks what you have, learns what you need, and sends a pre-filled cart to your favorite store — ready to buy with one tap.
+    </p>
+    <div class="hero-actions">
+      <a href="#notify" class="btn-primary">Get Early Access →</a>
+      <a href="#features" class="btn-secondary">See Features</a>
+    </div>
+    <div class="scroll-hint">
+      <div class="scroll-line"></div>
+      Scroll
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <p class="section-label">Core Features</p>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="feature-icon">📦</span>
+        <p class="feature-title">Inventory Tracking</p>
+        <p class="feature-desc">Set stock levels for every household item. The app knows what you're running low on before you do.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔁</span>
+        <p class="feature-title">Auto-Replenishment</p>
+        <p class="feature-desc">Define replenishment rules per item. When stock hits your threshold, it automatically queues a reorder.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🛒</span>
+        <p class="feature-title">One-Tap Ordering</p>
+        <p class="feature-desc">Your cart is built for you. Open it in Walmart, Kroger, or wherever you shop — and just hit buy.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📉</span>
+        <p class="feature-title">Price Tracking</p>
+        <p class="feature-desc">Monitor prices across stores. Get notified when an item drops below your threshold so you buy at the right time.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">📊</span>
+        <p class="feature-title">Spend Analytics</p>
+        <p class="feature-desc">Track order history, monthly spend, and savings over time — all in one household dashboard.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚙️</span>
+        <p class="feature-title">Automation Modes</p>
+        <p class="feature-desc">Choose how hands-on you want to be: fully manual, one-tap approval, or fully automated scheduled orders.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORES -->
+  <section class="stores" id="stores">
+    <p class="section-label">Supported Stores</p>
+    <div class="store-list">
+      <span class="store-badge primary">★ Walmart</span>
+      <span class="store-badge secondary">Instacart</span>
+      <span class="store-badge">Amazon Fresh</span>
+      <span class="store-badge">Kroger</span>
+      <span class="store-badge">Target</span>
+      <span class="store-badge">+ Many More</span>
+    </div>
+  </section>
+
+  <!-- NOTIFY -->
+  <section class="notify" id="notify">
+    <div class="notify-box">
+      <div>
+        <h2 class="notify-heading">Get notified<br /><span>at launch.</span></h2>
+        <p class="notify-sub">Be first in line when F.O.O.D. Databases hits the Play Store. No spam — just one email when it's ready.</p>
+      </div>
+      <form
+        action="https://formspree.io/f/YOUR_FORM_ID"
+        method="POST"
+        onsubmit="handleSubmit(event)"
+      >
+        <div class="form-row">
+          <input class="form-input" type="email" name="email" placeholder="your@email.com" required />
+          <button type="submit" class="btn-primary">Notify Me →</button>
+        </div>
+        <p class="form-note" id="form-msg">// No account required. Unsubscribe anytime.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">F.O.O.D. DATABASES</span>
+    <span class="footer-note">© 2025 · ANDROID · COMING SOON</span>
+  </footer>
+
+  <script>
+    // Smooth anchor scroll offset for fixed nav
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Form feedback
+    function handleSubmit(e) {
+      const msg = document.getElementById('form-msg');
+      // If using Formspree, let it handle natively — this just gives instant feedback
+      setTimeout(() => {
+        msg.textContent = '// ✓ You\'re on the list. We\'ll be in touch.';
+        msg.style.color = 'var(--accent)';
+      }, 400);
+    }
+  </script>
+
+</body>
+</html>
